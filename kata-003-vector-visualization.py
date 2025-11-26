@@ -310,7 +310,9 @@
 #     custom_mover(C[1], C[2])
 #     custom_mover(C[2], C[0])
 
-
+########################################################################################################################################
+###################################################### ROUND 5 + 6 #########################################################################
+########################################################################################################################################
       
 from manim import * 
 import numpy as np
@@ -340,6 +342,17 @@ class Vectors(ThreeDScene):
     Xr = Xp @ C[:k, :] # (N, k) @ (k, n) = (N, n)
 
 
+
+    #Visualize the principal components
+    colors = [PURE_RED, PURE_BLUE, PURE_GREEN] 
+    pcs = []
+    for i, pc in enumerate(C):
+      vec = Arrow3D(start=ORIGIN, end=pc, color=colors[i], base_radius=0.05, thickness=0.05)
+      pcs.append(vec)
+    self.add(*pcs)
+
+
+    # VIsualize the vectors 
     vs = []
     for i in range(N):
       vec = Vector(Xc[i])
@@ -350,16 +363,26 @@ class Vectors(ThreeDScene):
 
 
 
-    def move_camera(v1, v2):
-      normal = np.cross(v1, v2)
-      normal = normal / np.linalg.norm(normal)
-      nx, ny, nz = normal
-      theta = np.arctan2(nx, ny)
-      phi = np.arccos(nz)
-      self.move_camera(phi=phi, theta=theta, run_time=1)
 
-    move_camera(C[0], C[1])
-    self.wait(1)
+
+    def viewer(C):
+      def move_camera(v1, v2):
+        normal = np.cross(v1, v2)
+        normal = normal / np.linalg.norm(normal)
+        nx, ny, nz = normal
+        theta = np.arctan2(nx, ny)
+        phi = np.arccos(nz)
+        self.move_camera(phi=phi, theta=theta, run_time=1)
+
+      move_camera(C[0], C[1])
+      move_camera(C[1], C[0])
+      self.wait(1)
+      move_camera(C[1], C[2])
+      move_camera(C[2], C[1])
+      self.wait(1)
+      move_camera(C[2], C[0])
+      move_camera(C[0], C[2])
+    viewer(C)
 
     
     
